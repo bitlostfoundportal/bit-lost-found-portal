@@ -40,14 +40,16 @@ const upload = multer({ storage: storage });
 
 // --- MySQL connection ---
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "lostfound",
+  host: "sql100.infinityfree.com",            // InfinityFree MySQL Host
+  user: "if0_40286640",                      // InfinityFree MySQL Username
+  password: "Vasanth51575",              // 🔒 Replace with your actual MySQL password
+  database: "if0_40286640_bitlostfound_db",  // Your InfinityFree database name
+  port: 3306                                 // Default MySQL port
 });
+
 db.connect((err) => {
   if (err) {
-    console.error("MySQL connect error:", err);
+    console.error("❌ MySQL connect error:", err);
     process.exit(1);
   }
   console.log("✅ MySQL Connected");
