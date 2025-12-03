@@ -351,7 +351,10 @@ app.get("/api/google-client-id", (req, res) => {
 
 // Google OAuth routes (already defined, ensure the callback route is correct)
 // Note: The /auth/google initiation is now handled by the root route if unauthenticated.
-app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+app.get("/auth/google", (req, res, next) => {
+  logger.info("Redirecting to Google for OAuth...");
+  passport.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
+});
 
 // Placeholder for username/password login
 app.post("/login", (req, res, next) => {
@@ -377,6 +380,7 @@ app.post("/login", (req, res, next) => {
 
 app.get("/auth/google/callback",
   (req, res, next) => {
+    logger.info("Google OAuth callback received.");
     passport.authenticate("google", { failureRedirect: "/?msg=Google login failed!&type=error" }, (err, user, info) => {
       if (err) {
         if (err.message === "Only @bitsathy.ac.in email addresses are allowed.") {
