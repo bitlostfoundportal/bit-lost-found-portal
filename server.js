@@ -2,7 +2,8 @@
 // BIT Lost-Found Portal - consolidated MongoDB version
 // Keep this file as the single backend entrypoint for Render/local.
 
-require("dotenv").config({ override: true }); // load .env first, and ensure it overrides existing env vars
+// Removed dotenv override as Render injects env vars directly.
+// require("dotenv").config({ override: true }); 
 const express = require("express");
 const bodyParser = require("body-parser");
 const session = require("express-session");
@@ -91,24 +92,29 @@ app.use(express.static(path.join(__dirname, "public"), { maxAge: "30d" }));
 // const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || "").split(",").map(s => s.trim()).filter(Boolean);
 app.use(cors({
   origin: (origin, callback) => {
+    logger.debug(`CORS Check: Origin = '${origin}', NODE_ENV = '${process.env.NODE_ENV}'`);
     const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || "").split(",").map(s => s.trim()).filter(Boolean);
+    logger.debug(`CORS Check: Allowed Origins = [${allowedOrigins.join(', ')}]`);
 
     if (process.env.NODE_ENV !== "production") {
+      logger.debug("CORS: Allowing all origins in development.");
       // In development, allow all origins.
       return callback(null, true);
     }
 
     // In production, explicitly allow requests with no origin (e.g., direct server requests, health checks).
     if (!origin) {
+      logger.debug("CORS: Allowing request with null/undefined origin in production.");
       return callback(null, true);
     }
 
     // For requests with an origin, check if it's in the allowed list.
     if (allowedOrigins.includes(origin)) {
+      logger.debug(`CORS: Allowing origin '${origin}' as it is in the allowed list.`);
       return callback(null, true);
     }
 
-    logger.warn(`CORS: Origin ${origin} not allowed.`);
+    logger.warn(`CORS: Origin '${origin}' not allowed.`);
     return callback(new Error("Not allowed by CORS"));
   },
   credentials: true
