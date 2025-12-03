@@ -75,10 +75,8 @@ app.use(helmet({
       frameAncestors: ["'self'"],
       imgSrc: ["'self'", "data:", "https://res.cloudinary.com", "https://www.gstatic.com"], // Allow Cloudinary images and Google static images
       objectSrc: ["'none'"],
-      scriptSrc: ["'self'",
-                  // Allow 'unsafe-inline' scripts ONLY in development
-                  process.env.NODE_ENV === 'development' ? "'unsafe-inline'" : "'self'"],
-      scriptSrcAttr: [process.env.NODE_ENV === 'development' ? "'unsafe-inline'" : "'none'"], // Corrected: Allow 'unsafe-inline' for attributes in development, 'none' otherwise
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrcAttr: ["'unsafe-inline'"], // Allow 'unsafe-inline' for attributes
       styleSrc: ["'self'", "https:", "'unsafe-inline'"], // 'unsafe-inline' often needed for local CSS
       upgradeInsecureRequests: [],
     },
