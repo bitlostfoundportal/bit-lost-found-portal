@@ -100,12 +100,15 @@ app.use(cors({
       return callback(null, true);
     }
 
+    // In production, allow requests with no origin (like mobile apps or curl requests, or Render's health checks)
+    // ONLY if the origin is undefined or null, AND it's not explicitly in allowedOrigins (because you can't have 'undefined' in allowedOrigins string)
+    // Or if there are no allowed origins specified at all (meaning allow all)
     if (!origin && allowedOrigins.length === 0) {
-      // Allow requests with no origin (like mobile apps or curl requests) if no specific origins are defined
       return callback(null, true);
     }
 
-    if (allowedOrigins.includes(origin)) {
+    // If there is an origin, check if it's in the allowed list
+    if (origin && allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
