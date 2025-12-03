@@ -269,6 +269,7 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: process.env.NODE_ENV === "production", // Explicitly set rejectUnauthorized within tls
   },
+  connectionTimeout: 10000, // Add a 10-second connection timeout
 });
 
 // verify transporter at startup (non-blocking)
