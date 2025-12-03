@@ -103,8 +103,9 @@ app.use(cors({
     }
 
     // In production, explicitly allow requests with no origin (e.g., direct server requests, health checks).
-    if (!origin) {
-      logger.debug("CORS: Allowing request with null/undefined origin in production.");
+    // Also explicitly allow the string 'null' often sent by some clients/environments for non-browser requests.
+    if (!origin || origin === 'null') {
+      logger.debug("CORS: Allowing request with null/undefined/\'null\' origin in production.");
       return callback(null, true);
     }
 
