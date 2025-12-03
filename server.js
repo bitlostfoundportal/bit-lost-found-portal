@@ -262,10 +262,7 @@ const EMAIL_PASS = process.env.EMAIL_PASS;
 logger.info(`Nodemailer config: NODE_ENV=${process.env.NODE_ENV}, rejectUnauthorized=${process.env.NODE_ENV === "production"}`);
 const transporter = nodemailer.createTransport({
   service: 'gmail',
-  host: 'smtp.gmail.com', // Explicitly set host for port 587 configuration
-  port: 587,              // Changed to port 587
-  secure: false,          // Changed to false for port 587
-  requireTLS: true,       // Require TLS for port 587
+  // Removed explicit host, port, secure, requireTLS, relying on 'service: gmail'
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -273,7 +270,7 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: process.env.NODE_ENV === "production", // Explicitly set rejectUnauthorized within tls
   },
-  connectionTimeout: 10000, // Add a 10-second connection timeout
+  connectionTimeout: 10000, // Keep the 10-second connection timeout
 });
 
 // verify transporter at startup (non-blocking)
