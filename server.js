@@ -96,19 +96,17 @@ app.use(cors({
     const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || "").split(",").map(s => s.trim()).filter(Boolean);
 
     if (process.env.NODE_ENV !== "production") {
-      // Allow all origins in development
+      // In development, allow all origins.
       return callback(null, true);
     }
 
-    // In production, allow requests with no origin (like mobile apps or curl requests, or Render's health checks)
-    // ONLY if the origin is undefined or null, AND it's not explicitly in allowedOrigins (because you can't have 'undefined' in allowedOrigins string)
-    // Or if there are no allowed origins specified at all (meaning allow all)
-    if (!origin && allowedOrigins.length === 0) {
+    // In production, explicitly allow requests with no origin (e.g., direct server requests, health checks).
+    if (!origin) {
       return callback(null, true);
     }
 
-    // If there is an origin, check if it's in the allowed list
-    if (origin && allowedOrigins.includes(origin)) {
+    // For requests with an origin, check if it's in the allowed list.
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
