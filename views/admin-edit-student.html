@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Student (Admin) | BIT Lost-Found Portal</title>
+  <link rel="stylesheet" href="/css/edit-report.css"> <!-- Reusing edit-report CSS for form styling -->
+  <link rel="stylesheet" href="/css/popup.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-content">
+      <h1>BIT Lost-Found Portal (Admin)</h1>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="message-area"></div>
+    <div class="form-container">
+      <h2>Edit Student (Admin)</h2>
+      <form id="adminEditStudentForm">
+
+        <label><span class="emoji">🆔</span> Student ID:</label>
+        <input type="text" name="_id" readonly>
+
+        <label><span class="emoji">🔢</span> Roll No.:</label>
+        <input type="text" name="rollno" required>
+
+        <label><span class="emoji">👤</span> Name:</label>
+        <input type="text" name="name" required>
+
+        <label><span class="emoji">📧</span> College Email:</label>
+        <input type="email" name="college_email" required>
+
+        <label><strong>Name from Email Login:</strong></label>
+        <input type="text" id="nameFromEmailDisplay" name="google_display_name" value="" >
+        
+        <p><strong>Names Match:</strong> <span id="namesMatchDisplay">N/A</span></p>
+
+        <label><span class="emoji">🌐</span> Google ID:</label>
+        <input type="text" name="googleId" readonly>
+
+        <button type="submit">Update Student (Admin)</button>
+      </form>
+
+      <a href="/admin/manage-students" class="back">⬅ Back to Manage Students</a>
+
+    </div>
+  </main>
+
+  <script src="/js/popup.js"></script>
+  <script>
+    const studentId = window.location.pathname.split("/").pop();
+    const form = document.getElementById('adminEditStudentForm');
+
+    // ==========================
+    // 🔹 Load existing student data (Admin API)
+    // ==========================
+    fetch(`/api/admin/student/${studentId}/data`)
+      .then(res => res.json())
+      .then(student => {
+        if (student.error) {
+          showPopup(student.error, 'error');
+          return;
+        }
+        form._id.value = student._id;
+        form.rollno.value = student.rollno;
+        form.name.value = student.name;
+        form.college_email.value = student.college_email;
+        form.googleId.value = student.googleId || '';
+        
+        document.getElementById('nameFromEmailDisplay').value = student.google_display_name || '';
+        document.getElementById('namesMatchDisplay').textContent = student.names_match ? '✅ Yes' : '❌ No';
+      })
+      .catch(err => {
+        console.error('Error loading admin student data:', err);
+        showPopup('❌ Failed to load student data.', 'error');
+      });
+
+    // ==========================
+    // 🔹 Submit via Fetch + Popup (Admin API)
+    // ==========================
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const formData = new FormData(form);
+
+      // Convert FormData to plain object for JSON payload
+      const data = {};
+      for (let [key, value] of formData.entries()) {
+        data[key] = value;
+      }
+
+      try {
+        const response = await fetch(`/api/admin/student/${studentId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        showPopup(result.message, response.ok ? "success" : "error");
+        if (response.ok) {
+          setTimeout(() => window.location.href = "/admin/manage-students", 2000);
+        }
+
+      } catch (err) {
+        console.error('Error updating admin student:', err);
+        showPopup("⚠️ Error updating student: " + err.message, "error");
+      }
+    });
+
+    // Function to parse URL parameters and display messages
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const msg = urlParams.get('msg');
+      const type = urlParams.get('type');
+
+      if (msg && type) {
+        showPopup(decodeURIComponent(msg), type);
+      }
+    });
+  </script>
+</body>
+</html>

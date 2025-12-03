@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - BIT Lost & Found Portal</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/popup.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Additional admin dashboard specific styles */
+        .admin-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .admin-nav a {
+            display: inline-block;
+            background: var(--gradient-primary);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        .admin-nav a:hover {
+            background: var(--gradient-primary) !important;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            opacity: 0.95;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>BIT Lost-Found Portal</h1>
+            </div>
+            <!-- Removed navigation for admin page -->
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="message-area"></div>
+        <div class="welcome-section" style="text-align: center;">
+            <h2>Admin Dashboard</h2>
+            <p>Welcome, <span id="adminName"></span> (<span id="adminEmail"></span>)!</p>
+        </div>
+
+        <div class="dashboard-summary">
+            <div class="summary-card">
+                <h4><i class="fas fa-chart-bar"></i> Total Reports</h4>
+                <p id="totalReportsCount">...</p>
+            </div>
+            <div class="summary-card">
+                <h4><i class="fas fa-exclamation-circle"></i> Lost Reports</h4>
+                <p id="lostReportsCount">...</p>
+            </div>
+            <div class="summary-card">
+                <h4><i class="fas fa-search"></i> Found Reports</h4>
+                <p id="foundReportsCount">...</p>
+            </div>
+            <div class="summary-card">
+                <h4><i class="fas fa-check-circle"></i> Resolved Reports</h4>
+                <p id="doneReportsCount">...</p>
+            </div>
+            <div class="summary-card">
+                <h4><i class="fas fa-users"></i> Registered Students</h4>
+                <p id="totalStudentsCount">...</p>
+            </div>
+        </div>
+
+        <div class="admin-nav">
+            <a href="/admin/manage-items">Manage Items</a>
+            <a href="/admin/manage-students">Manage Students</a>
+            <a href="/logout">Logout</a>
+        </div>
+
+        <!-- The tables and modal will be moved to separate pages -->
+
+    </main>
+
+    <script src="/js/popup.js"></script>
+    <script>
+        let currentDeleteItem = null; // To store the ID of the item/student to be deleted
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const messageArea = document.getElementById('message-area');
+            const adminNameSpan = document.getElementById('adminName');
+            const adminEmailSpan = document.getElementById('adminEmail');
+
+            const totalReportsCountSpan = document.getElementById('totalReportsCount');
+            const totalStudentsCountSpan = document.getElementById('totalStudentsCount');
+
+            const lostReportsCountSpan = document.getElementById('lostReportsCount');
+            const foundReportsCountSpan = document.getElementById('foundReportsCount');
+            const doneReportsCountSpan = document.getElementById('doneReportsCount');
+
+            // Fetch user info for admin dashboard
+            try {
+                const userRes = await fetch('/api/user');
+                const userData = await userRes.json();
+
+                if (userData.error) {
+                    showPopup(userData.error, 'error');
+                    return;
+                }
+                adminNameSpan.textContent = userData.name;
+                adminEmailSpan.textContent = userData.rollno; // Display rollno as the unique identifier
+
+            } catch (error) {
+                console.error('Error fetching admin user data:', error);
+                showPopup('Error loading admin data.', 'error');
+            }
+
+            // Fetch counts for dashboard summary
+            try {
+                const reportsCountRes = await fetch('/api/admin/reports-count'); // NEW API endpoint
+                const reportsCountData = await reportsCountRes.json();
+                if (reportsCountData.error) {
+                    showPopup(reportsCountData.error, 'error');
+                } else {
+                    totalReportsCountSpan.textContent = reportsCountData.totalCount;
+                    lostReportsCountSpan.textContent = reportsCountData.lostCount;
+                    foundReportsCountSpan.textContent = reportsCountData.foundCount;
+                    doneReportsCountSpan.textContent = reportsCountData.doneCount;
+                }
+
+                const studentsCountRes = await fetch('/api/admin/students-count'); // NEW API endpoint
+                const studentsCountData = await studentsCountRes.json();
+                if (studentsCountData.error) {
+                    showPopup(studentsCountData.error, 'error');
+                } else {
+                    totalStudentsCountSpan.textContent = studentsCountData.count;
+                }
+
+            } catch (error) {
+                console.error('Error fetching dashboard counts:', error);
+                showPopup('Error loading dashboard counts.', 'error');
+            }
+
+            // The rest of the script (table loading, modal logic) will be moved to manage-items/students.html
+
+        });
+
+        // Function to parse URL parameters and display messages
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const msg = urlParams.get('msg');
+            const type = urlParams.get('type');
+
+            if (msg && type) {
+                showPopup(decodeURIComponent(msg), type);
+                // history.replaceState(null, '', window.location.pathname);
+            }
+        });
+    </script>
+</body>
+</html>

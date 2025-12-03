@@ -13,13 +13,13 @@
     <h1>BIT Lost-Found Portal</h1>
   </header>
 
-  <main class="container">
+  <main class="main-container">
     <div class="form-container">
       <h2>Report Lost Item</h2>
       <form method="POST" action="/submit-lost" enctype="multipart/form-data">
 
         <label><span class="emoji">📦</span> Item Name:</label>
-        <input type="text" name="item_name" placeholder="Enter item name" required>
+        <input type="text" name="item_name" placeholder="Enter item name" required minlength="6">
 
         <label><span class="emoji">🗂️</span> Item Type:</label>
         <select name="item_type" required>
@@ -47,10 +47,7 @@
         <input type="text" name="item_place" placeholder="Enter place" required>
 
         <label><span class="emoji">📱</span> Mobile Number:</label>
-        <input type="text" name="mobile_number" placeholder="Enter your mobile number" required>
-
-        <label><span class="emoji">✉️</span> College Email:</label>
-        <input type="email" name="college_email" placeholder="Enter your college email" required>
+        <input type="text" name="mobile_number" placeholder="Enter your mobile number" required pattern="[0-9]{10}" maxlength="10">
 
         <label><span class="emoji">📝</span> Description:</label>
         <textarea name="description" placeholder="Provide item description" required></textarea>
@@ -74,6 +71,7 @@
       </footer>
     </div>
   </main>
-
+<link rel="stylesheet" href="/css/popup.css">
+<script src="/js/popup.js"></script>
 </body>
 </html>

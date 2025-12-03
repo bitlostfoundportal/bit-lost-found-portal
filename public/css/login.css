@@ -1,26 +1,41 @@
 /* Base */
+:root {
+  --primary-color: #004aad;
+  --secondary-color: #005ad5;
+  --accent-color: #f0f8ff;
+  --text-dark: #2c3e50;
+  --text-medium: #6c7a89;
+  --text-light: #9baab5;
+  --border-color: #e0e6ed;
+  --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.12);
+  --gradient-blue: linear-gradient(135deg, #004aad 0%, #007bff 100%);
+}
+
 body {
   font-family: "Poppins", "Segoe UI", sans-serif;
-  background: linear-gradient(135deg, #e8f0ff, #f3f7fc);
+  background: var(--accent-color);
   margin: 0;
   text-align: center;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  color: var(--text-dark);
 }
 
 /* Header */
 .header {
   width: 100%;
-  background: linear-gradient(135deg, #004aad, #007bff);
+  background: var(--gradient-blue);
   color: white;
-  padding: 15px 0;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  padding: 18px 0;
+  box-shadow: var(--shadow-light);
 }
 .header h1 {
   margin: 0;
-  font-size: 22px;
-  letter-spacing: 0.5px;
+  font-size: 24px;
+  letter-spacing: 0.8px;
+  font-weight: 600;
 }
 
 /* Login Form Container */
@@ -29,90 +44,219 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 40px 20px;
+  padding: 50px 20px;
 }
 
 .form-card {
   background: #fff;
-  padding: 35px 30px;
-  border-radius: 15px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-  max-width: 400px;
+  padding: 45px 40px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-medium);
+  max-width: 450px;
   width: 100%;
-  transition: all 0.3s ease;
-}
-.form-card:hover {
-  transform: translateY(-3px);
+  transition: all 0.4s ease-in-out;
 }
 
 .form-card h2 {
-  margin-bottom: 25px;
-  color: #222;
-  font-size: 22px;
+  margin-bottom: 30px;
+  color: var(--text-dark);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.login-text {
+  color: var(--text-medium);
+  margin-bottom: 30px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.input-group {
+  margin-bottom: 22px;
 }
 
 label {
   display: block;
-  font-weight: 500;
-  margin-bottom: 5px;
-  color: #333;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-dark);
   text-align: left;
+  font-size: 14px;
 }
 
 input {
   width: 100%;
-  padding: 12px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: 14px 18px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 15px;
   box-sizing: border-box;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(135deg, #007bff, #005ad5);
-  color: white;
-  font-size: 16px;
-  font-weight: 500;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 3px 8px rgba(0,123,255,0.25);
   transition: all 0.3s ease;
 }
 
-button:hover {
-  background: linear-gradient(135deg, #005ad5, #0043a6);
+input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 74, 173, 0.15);
+  outline: none;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 15px;
+  background: var(--gradient-blue);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+  transition: all 0.3s ease;
+  margin-top: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.login-btn:hover {
+  background: linear-gradient(135deg, #005ad5, #004aad);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
   transform: translateY(-2px);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(0, 123, 255, 0.2);
+}
+
+.or-separator {
+  margin: 30px 0;
+  color: var(--text-light);
+  font-size: 13px;
+  font-weight: 500;
+  position: relative;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.or-separator::before,
+.or-separator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 38%;
+  height: 1px;
+  background: var(--border-color);
+}
+
+.or-separator::before {
+  left: 0;
+}
+
+.or-separator::after {
+  right: 0;
+}
+
+.google-login-btn {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  background: #fff;
+  color: #3c4043;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: "Google Sans", "Roboto", "Arial", sans-serif;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: var(--shadow-light);
+  transition: all .3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  position: relative;
+  line-height: 1;
+  box-sizing: border-box;
+  outline: none;
+  flex-direction: row;
+}
+
+.google-login-btn:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  background-color: var(--accent-color);
+  border-color: var(--primary-color);
+}
+
+.google-login-btn:active {
+  background-color: #e6f0ff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.google-login-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 74, 173, 0.15);
+}
+
+.google-login-btn svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  transform: translateY(1px);
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+}
+
+.google-login-btn span {
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  color: var(--text-dark);
+  white-space: nowrap;
+  line-height: 1;
 }
 
 /* Footer */
 footer {
-  padding: 15px 0;
-  font-size: 13px;
-  color: #555;
+  padding: 20px 0;
+  font-size: 14px;
+  color: var(--text-medium);
+  background: #fdfefe;
+  border-top: 1px solid var(--border-color);
+}
+footer p {
+    margin: 0;
 }
 footer a {
-  color: #007bff;
+  color: var(--primary-color);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 footer a:hover {
   text-decoration: underline;
+  color: var(--secondary-color);
 }
 
 /* Mobile Responsive */
 @media (max-width: 500px) {
   .form-card {
-    padding: 25px 20px;
+    padding: 30px 25px;
+    margin: 0 15px;
   }
   .form-card h2 {
-    font-size: 20px;
+    font-size: 22px;
   }
-  input, button {
-    font-size: 15px;
-    padding: 10px;
+  input, .login-btn, .google-login-btn {
+    font-size: 14px;
+    padding: 12px;
+  }
+  .google-login-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+  .header h1 {
+    font-size: 20px;
   }
 }

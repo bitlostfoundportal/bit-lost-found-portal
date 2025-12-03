@@ -1,136 +1,161 @@
+/* Import Google Fonts - Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 /* General Body */
 body {
   font-family: "Poppins", "Segoe UI", sans-serif;
-  background: linear-gradient(135deg, #e8f0ff, #f3f7fc);
+  background: #f8faff; /* Lighter, subtle background */
   margin: 0;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
+  color: #333;
 }
 
-/* Portal Title */
+/* Header */
 .header {
   width: 100%;
-  background: linear-gradient(135deg, #004aad, #007bff);
+  background: #004aad; /* Solid primary color */
   color: white;
-  padding: 15px 0;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  padding: 18px 0;
+  box-shadow: 0 4px 15px rgba(0, 74, 173, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 .header h1 {
   margin: 0;
-  font-size: 22px;
-  letter-spacing: 0.5px;
+  font-size: clamp(20px, 4vw, 28px);
+  letter-spacing: 1px;
+  font-weight: 600;
 }
 
-/* Main Card */
+/* Main Container (Card-like) */
 .container {
-  background: #fff;
-  width: 400px;
-  max-width: 95%;
-  margin-top: 50px;
-  padding: 35px 25px;
-  border-radius: 15px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  width: 500px; /* Slightly wider */
+  max-width: 90%;
+  margin-top: 40px;
+  padding: 40px 30px;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  border: 1px solid #e0e6eb;
 }
 .container:hover {
-  transform: translateY(-3px);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
 }
 
 /* Profile Section */
 .profile {
   display: flex;
+  flex-direction: column; /* Stack vertically for cleaner look */
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 25px;
+  gap: 15px;
+  margin-bottom: 30px;
+  padding: 15px;
+  background: #f0f6ff;
+  border-radius: 12px;
+  border: 1px solid #d0e0ff;
 }
 .avatar {
-  font-size: 40px;
+  font-size: 55px; /* Larger avatar */
+  line-height: 1;
 }
 .info h2 {
   margin: 0;
-  font-size: 22px;
-  color: #222;
+  font-size: 24px;
+  color: #004aad; /* Primary color for name */
+  font-weight: 600;
 }
 .info p {
-  margin: 3px 0 0;
-  color: #666;
-  font-size: 14px;
+  margin: 5px 0 0;
+  color: #555;
+  font-size: 15px;
+  font-weight: 400;
 }
 
 /* Quick Stats Grid */
 .stats-grid {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 25px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); /* Responsive grid */
+  gap: 15px;
+  margin-bottom: 30px;
 }
 .stat-card {
-  flex: 1;
-  background: linear-gradient(135deg, #007bff, #005ad5);
-  color: #fff;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 3px 8px rgba(0, 123, 255, 0.25);
+  background: #ffffff; /* White background for stats */
+  color: #004aad; /* Primary color for text */
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
   transition: all 0.3s ease;
+  border: 1px solid #e0e6eb;
 }
 .stat-card h3 {
   margin: 0;
-  font-size: 20px;
+  font-size: 28px; /* Larger numbers */
+  font-weight: 700;
+  color: #0056b3;
 }
 .stat-card p {
   margin: 5px 0 0;
-  font-size: 14px;
+  font-size: 15px;
+  color: #666;
 }
 .stat-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3);
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
 }
 
-/* Buttons Section */
+/* Links / Buttons */
 .links {
-  display: flex;
-  flex-direction: column;
-  gap: 8px; /* Reduced spacing between buttons */
-  margin-bottom: 20px;
+  display: grid; /* Use grid for buttons */
+  grid-template-columns: 1fr; /* Single column by default */
+  gap: 12px;
+  margin-bottom: 30px;
 }
 .btn {
-  background: linear-gradient(135deg, #007bff, #005ad5);
+  background: linear-gradient(45deg, #007bff, #0056b3); /* Refined gradient */
   color: white;
-  padding: 12px;
-  border-radius: 8px;
+  padding: 15px 20px;
+  border-radius: 10px;
   text-decoration: none;
-  font-weight: 500;
-  font-size: 15px;
-  box-shadow: 0 3px 8px rgba(0, 123, 255, 0.25);
+  font-weight: 600;
+  font-size: 16px;
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
   transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
 }
 .btn:hover {
-  background: linear-gradient(135deg, #005ad5, #0043a6);
+  background: linear-gradient(45deg, #0056b3, #004085);
   transform: translateY(-2px);
+  box-shadow: 0 7px 18px rgba(0, 123, 255, 0.3);
 }
 
 /* Logout Button */
 .logout {
-  background: linear-gradient(135deg, #dc3545, #b02a37);
-  box-shadow: 0 3px 8px rgba(220, 53, 69, 0.25);
+  background: linear-gradient(45deg, #dc3545, #b02a37); /* Red for danger */
+  box-shadow: 0 5px 15px rgba(220, 53, 69, 0.2);
 }
 .logout:hover {
-  background: linear-gradient(135deg, #b02a37, #8a1e28);
+  background: linear-gradient(45deg, #b02a37, #8a1e28);
 }
 
 /* Footer */
 footer {
-  border-top: 1px solid #eee;
-  padding-top: 10px;
-  font-size: 13px;
-  color: #555;
+  margin-top: 25px;
+  border-top: 1px solid #e9ecef;
+  padding-top: 15px;
+  font-size: 14px;
+  color: #666;
 }
 footer a {
-  color: #007bff;
+  color: #0056b3;
   text-decoration: none;
   font-weight: 500;
 }
@@ -138,28 +163,60 @@ footer a:hover {
   text-decoration: underline;
 }
 
-/* Responsive */
-@media (max-width: 480px) {
+/* Responsive Adjustments */
+@media (min-width: 768px) {
+  .links {
+    grid-template-columns: 1fr 1fr; /* Two columns for larger screens */
+  }
+  .links .logout { /* Span two columns for logout on larger screens */
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 600px) {
   .container {
-    width: 95%;
-    padding: 25px 15px;
+    padding: 30px 20px;
+    margin-top: 25px;
   }
   .profile {
-    flex-direction: column;
-    gap: 8px;
+    gap: 12px;
   }
   .avatar {
-    font-size: 36px;
+    font-size: 48px;
+  }
+  .info h2 {
+    font-size: 22px;
+  }
+  .stat-card h3 {
+    font-size: 24px;
+  }
+  .btn {
+    font-size: 15px;
+    padding: 13px 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 25px 15px;
+  }
+  .header h1 {
+    font-size: clamp(18px, 5vw, 24px);
+  }
+  .avatar {
+    font-size: 40px;
   }
   .info h2 {
     font-size: 20px;
   }
-  .links .btn {
-    font-size: 14px;
-    padding: 10px;
+  .stat-card {
+    padding: 15px;
   }
-  .stats-grid {
-    flex-direction: column;
-    gap: 10px;
+  .stat-card h3 {
+    font-size: 22px;
+  }
+  .btn {
+    font-size: 14px;
+    padding: 12px 15px;
   }
 }

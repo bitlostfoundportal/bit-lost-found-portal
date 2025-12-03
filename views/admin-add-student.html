@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add New Student (Admin) | BIT Lost-Found Portal</title>
+  <link rel="stylesheet" href="/css/edit-report.css"> <!-- Reusing edit-report CSS for form styling -->
+  <link rel="stylesheet" href="/css/popup.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-content">
+      <h1>BIT Lost-Found Portal (Admin)</h1>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div id="message-area"></div>
+    <div class="form-container">
+      <h2>Add New Student (Admin)</h2>
+      <form id="adminAddStudentForm">
+
+        <label><span class="emoji">🔢</span> Roll No.:</label>
+        <input type="text" name="rollno" required placeholder="e.g., 7376241CS453">
+
+        <label><span class="emoji">👤</span> Name:</label>
+        <input type="text" name="name" required placeholder="e.g., VASANTHARAJ M">
+
+        <label><span class="emoji">📧</span> College Email:</label>
+        <input type="email" name="college_email" placeholder="e.g., vasantharajm.cs24@bitsathy.ac.in">
+
+        
+        
+        
+        
+        <button type="submit">Create Student</button>
+      </form>
+
+      <a href="/admin/manage-students" class="back">⬅ Back to Manage Students</a>
+
+    </div>
+  </main>
+
+  <script src="/js/popup.js"></script>
+  <script>
+    const form = document.getElementById('adminAddStudentForm');
+
+    // ==========================
+    // 🔹 Submit via Fetch + Popup (Admin API)
+    // ==========================
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const formData = new FormData(form);
+
+      // Convert FormData to plain object for JSON payload
+      const data = {};
+      for (let [key, value] of formData.entries()) {
+        // Only include non-empty values (except for required fields)
+        if (value.trim() !== '' || key === 'rollno' || key === 'name') {
+          data[key] = value.trim();
+        }
+      }
+
+      // Remove empty optional fields
+      if (!data.college_email) delete data.college_email;
+      if (!data.google_display_name) delete data.google_display_name;
+      if (!data.password) delete data.password;
+      if (!data.googleId) delete data.googleId;
+
+      try {
+        const response = await fetch('/api/admin/student', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        showPopup(result.message || result.error, response.ok ? "success" : "error");
+        if (response.ok) {
+          // Clear form on success
+          form.reset();
+          setTimeout(() => window.location.href = "/admin/manage-students", 2000);
+        }
+
+      } catch (err) {
+        console.error('Error creating student:', err);
+        showPopup("⚠️ Error creating student: " + err.message, "error");
+      }
+    });
+
+    // Function to parse URL parameters and display messages
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const msg = urlParams.get('msg');
+      const type = urlParams.get('type');
+
+      if (msg && type) {
+        showPopup(decodeURIComponent(msg), type);
+      }
+    });
+  </script>
+</body>
+</html>
+

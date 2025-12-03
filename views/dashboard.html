@@ -13,6 +13,9 @@
   </header>
 
   <main class="container">
+    <!-- Message display area (for success/error popups) -->
+    <div id="message-area"></div>
+
     <!-- Profile Section -->
     <section class="profile">
       <div class="avatar">🧑‍🎓</div>
@@ -49,7 +52,7 @@
 
     <!-- Footer -->
     <footer>
-      For any queries, contact: 
+      For any queries, contact:
       <a href="https://mail.google.com/mail/?view=cm&fs=1&to=bitlostfoundportal@gmail.com" target="_blank">
         bitlostfoundportal@gmail.com
       </a>
@@ -57,6 +60,19 @@
   </main>
 
   <script>
+    // Function to parse URL parameters and display messages
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const msg = urlParams.get('msg');
+      const type = urlParams.get('type');
+
+      if (msg && type) {
+        showPopup(decodeURIComponent(msg), type);
+        // Optionally, clear the URL parameters to prevent re-display on refresh
+        // history.replaceState(null, '', window.location.pathname);
+      }
+    });
+
     // Fetch logged-in user data
     fetch('/api/user')
       .then(res => res.json())
@@ -72,6 +88,8 @@
       })
       .catch(err => console.error('Error loading user data:', err));
   </script>
+<link rel="stylesheet" href="/css/popup.css">
+<script src="/js/popup.js"></script>
 
 </body>
 </html>

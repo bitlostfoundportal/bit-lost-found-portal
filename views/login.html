@@ -13,32 +13,67 @@
     <h1>BIT Lost-Found Portal</h1>
   </header>
 
-  <!-- Login Form -->
+  <!-- Login Container -->
   <main class="login-container">
     <div class="form-card">
       <h2>🎓 Student Login</h2>
-      <form method="POST" action="/login">
-        <label for="rollno">Roll Number:</label>
-        <input type="text" id="rollno" name="rollno" placeholder="Enter your roll number" required>
-
-        <label for="name">Full Name:</label>
-        <input type="text" id="name" name="name" placeholder="Enter your full name" required>
-
-        <label for="college_email">College Email:</label>
-        <input type="email" id="college_email" name="college_email" placeholder="Enter your college email" required>
-
-        <button type="submit">Login</button>
+      <p class="login-text">Sign in to access the portal</p>
+      
+      <form action="/login" method="POST" class="login-form">
+        <div class="input-group">
+          <label for="rollno">Email Login</label>
+          <input type="text" id="rollno" name="rollno" required placeholder="e.g., 7376241CS453">
+        </div>
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required placeholder="Your password">
+        </div>
+        <button type="submit" class="login-btn">LOG IN</button>
       </form>
+
+      <div class="or-separator">Or</div>
+
+      <!-- Custom Google Sign In Button -->
+      <button class="google-login-btn" onclick="window.location.href='/auth/google'">
+        <svg width="20" height="20" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+          <g fill-rule="evenodd">
+            <path d="M9 3.48c1.69 0 2.83.73 3.48 1.34l2.54-2.48C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l2.91 2.26C4.6 5.05 6.62 3.48 9 3.48z" fill="#EA4335"/>
+            <path d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.21 1.18-.84 2.18-1.79 2.86l2.75 2.13c1.78-1.64 2.72-4.05 2.72-6.49z" fill="#4285F4"/>
+            <path d="M3.88 10.78A5.54 5.54 0 0 1 3.58 9c0-.62.11-1.22.29-1.78L.96 4.96A9.008 9.008 0 0 0 0 9c0 1.45.35 2.82.96 4.04l2.92-2.26z" fill="#FBBC05"/>
+            <path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.75-2.13c-.76.53-1.78.9-3.21.9-2.61 0-4.82-1.76-5.6-4.13L.96 13.04C2.45 15.98 5.48 18 9 18z" fill="#34A853"/>
+          </g>
+        </svg>
+        <span>Sign in with Google</span>
+      </button>
+
+      <!-- <p class="contact-text">
+        Having trouble logging in? <a href="mailto:bitlostfoundportal@gmail.com?subject=Login%20Assistance" class="contact-link">Contact us for assistance</a>.
+      </p> -->
+      <!-- Message display area (for success/error popups) -->
+      <div id="message-area"></div>
     </div>
   </main>
 
   <footer>
-    <p>For any queries, contact: 
+    <p>For any queries, contact:
       <a href="https://mail.google.com/mail/?view=cm&fs=1&to=bitlostfoundportal@gmail.com" target="_blank">
         bitlostfoundportal@gmail.com
       </a>
     </p>
   </footer>
+<link rel="stylesheet" href="/css/popup.css">
+<script src="/js/popup.js"></script>
+<script>
+  // Function to parse URL parameters and display messages
+  document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const msg = urlParams.get('msg');
+    const type = urlParams.get('type');
 
+    if (msg && type) {
+      showPopup(decodeURIComponent(msg), type);
+    }
+  });
+</script>
 </body>
 </html>

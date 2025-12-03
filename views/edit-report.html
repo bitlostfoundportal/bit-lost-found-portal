@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Edit My Report | BIT Lost-Found Portal</title>
   <link rel="stylesheet" href="/css/edit-report.css">
+  <link rel="stylesheet" href="/css/popup.css">
 </head>
 <body>
 
@@ -63,35 +64,44 @@
       <footer>
         For any queries, contact: 
         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=bitlostfoundportal@gmail.com" target="_blank">
-        bitlostfoundportal@gmail.com
-      </a>
+          bitlostfoundportal@gmail.com
+        </a>
       </footer>
     </div>
   </main>
 
+  <script src="/js/popup.js"></script>
   <script>
     const itemId = window.location.pathname.split("/").pop();
     const form = document.getElementById('editForm');
     const photoDiv = document.getElementById('photoPreview');
 
-    // Fetch item data
+    // ==========================
+    // 🔹 Load existing report data
+    // ==========================
     fetch(`/edit-item/${itemId}/data`)
       .then(res => res.json())
       .then(item => {
         form.item_name.value = item.item_name;
-        form.item_type.value = item.item_type;
+        form.item_type.value = item.item_type?.toLowerCase();
         form.item_block.value = item.item_block;
         form.item_place.value = item.item_place;
         form.description.value = item.description;
         form.remarks.value = item.remarks || "";
 
-        if(item.photo){
-          photoDiv.innerHTML = `<img src="/uploads/${item.photo}" class="thumb">`;
+        if (item.photo) {
+          photoDiv.innerHTML = item.photo.startsWith("http")
+            ? `<img src="${item.photo}" class="thumb">`
+            : `<img src="/uploads/${item.photo}" class="thumb">`;
+        } else {
+          photoDiv.innerHTML = "No photo available";
         }
       })
-      .catch(err => photoDiv.innerHTML = "Failed to load item");
+      .catch(() => photoDiv.innerHTML = "❌ Failed to load item");
 
-    // Handle form submit via AJAX
+    // ==========================
+    // 🔹 Submit via Fetch + Popup
+    // ==========================
     form.addEventListener('submit', async e => {
       e.preventDefault();
       const formData = new FormData(form);
@@ -101,14 +111,27 @@
           method: 'POST',
           body: formData
         });
-        const data = await response.json();
-        alert(data.message);
-        if(data.success) window.location.href = '/my-reports';
-      } catch(err) {
-        alert("Error updating report: " + err);
+
+        const contentType = response.headers.get("content-type");
+
+        // If backend sends JSON (✅ Correct way)
+        if (contentType && contentType.includes("application/json")) {
+          const data = await response.json();
+          showPopup(data.message, data.success ? "success" : "error");
+          if (data.success) {
+            setTimeout(() => window.location.href = "/my-reports", 2000);
+          }
+        } 
+        // If backend still redirects (fallback)
+        else {
+          showPopup("Report updated successfully!", "success");
+          setTimeout(() => window.location.href = "/my-reports", 2000);
+        }
+
+      } catch (err) {
+        showPopup("⚠️ Error updating report: " + err.message, "error");
       }
     });
   </script>
-
 </body>
 </html>

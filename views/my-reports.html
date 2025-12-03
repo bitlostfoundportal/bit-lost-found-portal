@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Reports | BIT Lost-Found Portal</title>
   <link rel="stylesheet" href="/css/my-reports.css">
+  <link rel="stylesheet" href="/css/popup.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -13,96 +15,289 @@
     <h1>BIT Lost-Found Portal</h1>
   </header>
 
-  <main class="container">
+  <main class="main-container">
     <h2>My Reported Items</h2>
 
-    <div class="table-scroll">
-      <table id="reports-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Block</th>
-            <th>Place</th>
-            <th>Description</th>
-            <th>Remarks</th>
-            <th>Status</th>
-            <th>Photo</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- JS will populate rows -->
-        </tbody>
-      </table>
+    
+    <div class="table-container">
+      <div class="table-scroll">
+        <table id="reports-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Block</th>
+              <th>Place</th>
+              <th>Description</th>
+              <th>Remarks</th>
+              <th>Status</th>
+              <th>Photo</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- JS will populate rows -->
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <a class="back" href="/dashboard"><span>⬅ Go Back</span></a>
 
     <footer>
-      For any queries, contact: 
-      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=bitlostfoundportal@gmail.com" target="_blank">
-        bitlostfoundportal@gmail.com
-      </a>
+      <p>For any queries, contact: 
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=bitlostfoundportal@gmail.com" target="_blank">
+          bitlostfoundportal@gmail.com
+        </a>
+      </p>
     </footer>
   </main>
 
+  <script src="/js/popup.js"></script>
   <script>
-    async function loadReports() {
-      try {
-        const res = await fetch('/my-reports/data');
-        const data = await res.json();
-        const tbody = document.querySelector("#reports-table tbody");
-        tbody.innerHTML = "";
-
-        if(data.length === 0){
-          tbody.innerHTML = "<tr><td colspan='9'>No reports found.</td></tr>";
-          return;
+    // Global variables
+    let allItems = [];
+    let currentFilter = 'all';
+    
+    // Status counters
+    const statusCounts = {
+      all: 0,
+      lost: 0,
+      found: 0,
+      contacted: 0,
+      completed: 0
+    };
+    
+    // DOM Elements
+    const statusBoxes = document.querySelectorAll('.status-box');
+    const statusCountElements = {
+      all: document.getElementById('all-count'),
+      lost: document.getElementById('lost-count'),
+      found: document.getElementById('found-count'),
+      contacted: document.getElementById('contacted-count'),
+      completed: document.getElementById('completed-count')
+    };
+    
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+      loadReports();
+      // setupEventListeners(); // Removed as status boxes are removed
+    });
+    
+    // Set up event listeners (no longer needed for status boxes)
+    function setupEventListeners() {
+      /*
+      statusBoxes.forEach(box => {
+        box.addEventListener('click', () => {
+          const status = box.dataset.status;
+          filterItems(status);
+          updateActiveStatusBox(status);
+        });
+      });
+      */
+    }
+    
+    // Update active status box (no longer needed)
+    function updateActiveStatusBox(status) {
+      /*
+      statusBoxes.forEach(box => {
+        if (box.dataset.status === status) {
+          box.classList.add('active');
+        } else {
+          box.classList.remove('active');
         }
+      });
+      currentFilter = status;
+      */
+    }
+    
+    // Filter items by status (simplified)
+    function filterItems(status) {
+      const tbody = document.querySelector("#reports-table tbody");
+      tbody.innerHTML = "";
+      
+      // Since filters are removed, always render all items
+      if (allItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9">No items found.</td></tr>`;
+        return;
+      }
+      
+      renderItems(allItems);
+    }
+    
+    // Render items to the table
+    function renderItems(items) {
+      const tbody = document.querySelector("#reports-table tbody");
+      tbody.innerHTML = items.map(item => {
+        const statusInfo = getStatusClass(item.status || '');
+        const badgeClass = statusInfo.class.replace('status ', 'status-badge '); // Apply base badge style + specific status style
 
-        data.forEach(item => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
+        return `
+        <tr data-status="${(item.status || '').toLowerCase()}">
           <td>${item.item_name || "-"}</td>
           <td>${item.item_type || "-"}</td>
           <td>${item.item_block || "-"}</td>
           <td>${item.item_place || "-"}</td>
           <td>${item.description || "-"}</td>
           <td>${item.remarks || "-"}</td>
-          <td><span class="status ${item.status.toLowerCase()}">${item.status || "-"}</span></td>
-          <td>${item.photo ? `<img src="/uploads/${item.photo}" class="thumb" onclick="openModal('/uploads/${item.photo}')">` : "-"}</td>
+          <td><span class="${badgeClass}">${statusInfo.text}</span></td>
+          <td>${
+            item.photo
+              ? `<img src="${item.photo.startsWith('http') ? item.photo : '/uploads/' + item.photo}" 
+                   class="thumb" 
+                   onclick="openModal('${item.photo.startsWith('http') ? item.photo : '/uploads/' + item.photo}')">`
+              : "-"
+          }</td>
           <td>
-            <button class="edit-btn" onclick="editReport(${item.item_id})">Edit</button>
-            <button class="delete-btn" onclick="deleteReport(${item.item_id})">Delete</button>
+            <button class="edit-btn" data-id="${item._id}">Edit</button>
+            <button class="delete-btn" data-id="${item._id}">Delete</button>
           </td>
-        `;
-        tbody.appendChild(tr);
+        </tr>`;
+      }).join('');
+      
+      // Reattach event listeners for edit and delete buttons
+      attachEventListeners();
+    }
+    
+    // Attach event listeners to buttons
+    function attachEventListeners() {
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          editReport(btn.dataset.id);
+        });
       });
+      
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          confirmDelete(btn.dataset.id);
+        });
+      });
+    }
+    
+    // Main function to load reports
+    async function loadReports() {
+      try {
+        console.log('Attempting to load reports...');
+        const res = await fetch('/my-reports/data');
+        
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`HTTP error! status: ${res.status}, body: ${errorText}`);
+        }
 
-      } catch(err) {
-        console.error("Error loading reports:", err);
+        allItems = await res.json();
+        console.log('Received data for my-reports/data:', allItems);
+        
+        // Reset counts
+        Object.keys(statusCounts).forEach(key => statusCounts[key] = 0);
+        
+        // Count items by status (no longer needed for display, but can be kept for other logic if desired)
+        /*
+        allItems.forEach(item => {
+          const status = (item.status || '').toLowerCase();
+          statusCounts.all++;
+          
+          if (status.includes('lost')) statusCounts.lost++;
+          else if (status.includes('found')) statusCounts.found++;
+          else if (status.includes('contact')) statusCounts.contacted++;
+          else if (status.includes('complete') || status.includes('done')) statusCounts.completed++;
+        });
+        */
+        
+        // Update count displays (no longer needed)
+        /*
+        Object.entries(statusCounts).forEach(([status, count]) => {
+          if (statusCountElements[status]) {
+            statusCountElements[status].textContent = count;
+          }
+        });
+        */
+        
+        // Show all items by default
+        filterItems('all'); // Call filterItems with 'all' to render all fetched items
+        // updateActiveStatusBox('all'); // Removed as status boxes are removed
+        
+      } catch (err) {
+        console.error('Error loading reports:', err);
+        showPopup('Error loading reports. Please try again.', 'error');
       }
     }
 
-    function openModal(src){
+    
+    
+    // Open image in modal
+    function openModal(src) {
       const modal = window.open(src, "_blank");
-      if(!modal) alert("Popup blocked. Allow popups to view image.");
+      if (!modal) showPopup("Popup blocked! Please allow popups to view the image.", "info");
     }
-
-    function editReport(id){
+    
+    // Edit report
+    function editReport(id) {
+      console.log('Edit button clicked for ID:', id);
       window.location.href = `/edit-item/${id}`;
     }
+    
+    // Confirm delete
+    function confirmDelete(id) {
+      console.log('Delete button clicked for ID:', id);
+      // Custom popup confirmation
+      const overlay = document.createElement("div");
+      overlay.className = "popup-overlay";
+      overlay.innerHTML = `
+        <div class="popup-card info">
+          <div class="popup-icon">⚠️</div>
+          <div class="popup-content">
+            <p>Are you sure you want to delete this report?</p>
+            <button id="confirm-yes" class="delete-btn">Yes</button>
+            <button id="confirm-no" class="cancel-btn">No</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
 
-    function deleteReport(id){
-      if(confirm("Are you sure you want to delete this report?")){
-        fetch(`/delete-item/${id}`, { method:'DELETE' })
-          .then(res => res.json())
-          .then(data => {
-            alert(data.message);
-            loadReports();
-          })
-          .catch(err => alert("Error: "+err));
+      overlay.querySelector("#confirm-yes").addEventListener("click", async () => {
+        await deleteReport(id);
+        overlay.remove();
+      });
+      overlay.querySelector("#confirm-no").addEventListener("click", () => overlay.remove());
+    }
+    
+    // Delete report
+    async function deleteReport(id) {
+      console.log('Attempting to delete report with ID:', id);
+      try {
+        await handlePopupFetch(`/delete-item/${id}`, { method: 'DELETE' });
+        // Reload the reports after deletion (handlePopupFetch should show popup)
+        allItems = []; // Clear existing data to force a full re-render
+        loadReports();
+      } catch (err) {
+        console.error('Error deleting report:', err);
+        // showPopup is now handled by handlePopupFetch, so direct call is removed
       }
+    }
+    
+    // Helper function to get the correct status class and display text
+    function getStatusClass(status) {
+      if (!status) return { class: 'status', text: '-' };
+      
+      const statusLower = status.toString().toLowerCase().trim();
+      
+      // Check all possible status variations (case insensitive and partial matches)
+      if (/contact/i.test(statusLower)) return { class: 'status status-contacted', text: 'Contacted' };
+      if (/complete|done|resolved/i.test(statusLower)) return { class: 'status status-done', text: 'Completed' };
+      if (/found|recovered/i.test(statusLower)) return { class: 'status status-found', text: 'Found' };
+      if (/lost|missing/i.test(statusLower)) return { class: 'status status-lost', text: 'Lost' };
+      
+      // Default status style if no match is found
+      return { class: 'status', text: status };
+    }
+
+    // Remove duplicate function if it exists
+    if (typeof getStatusClass === 'function') {
+      // Keep only one version of the function
+      window.getStatusClass = getStatusClass;
     }
 
     loadReports();

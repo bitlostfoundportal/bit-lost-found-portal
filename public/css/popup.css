@@ -1,0 +1,159 @@
+/* ================================
+   📦 POPUP OVERLAY & CARD DESIGN
+   Works with /public/js/popup.js
+===================================*/
+
+/* ===== Overlay (dark blur background) ===== */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+/* ===== Popup card ===== */
+.popup-card {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 18px;
+  padding: 30px 35px;
+  text-align: center;
+  width: 340px;
+  max-width: 90vw;
+  box-shadow: 0 8px 35px rgba(0, 0, 0, 0.35);
+  animation: popupScale 0.3s ease-out;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+/* ===== Color-coded top borders ===== */
+.popup-card.success {
+  border-top: 6px solid #28a745; /* green */
+}
+.popup-card.error {
+  border-top: 6px solid #dc3545; /* red */
+}
+.popup-card.info {
+  border-top: 6px solid #007bff; /* blue */
+}
+
+/* ===== Popup icon & text ===== */
+.popup-icon {
+  font-size: 42px;
+  margin-bottom: 12px;
+  display: block;
+  user-select: none;
+}
+
+.popup-content p {
+  margin: 10px 0;
+  font-size: 16.5px;
+  color: #222;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* ===== Confirmation Buttons (Yes/No) ===== */
+.popup-content .delete-btn,
+.popup-content .cancel-btn {
+  min-width: 80px; /* Ensure consistent width */
+  padding: 10px 22px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.1s, box-shadow 0.25s;
+  font-size: 15px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  margin-top: 15px; /* Apply common top margin */
+}
+
+.popup-content .delete-btn {
+  background: linear-gradient(135deg, #dc3545, #c82333); /* Red for delete */
+  color: #fff;
+}
+
+.popup-content .delete-btn:hover {
+  background: linear-gradient(135deg, #c82333, #bd2130);
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+.popup-content .cancel-btn {
+  margin-left: 15px; /* Space between Yes and No buttons */
+  background: linear-gradient(135deg, #6c757d, #5a6268); /* Grey/darker grey for cancel */
+  color: #fff;
+}
+
+.popup-content .cancel-btn:hover {
+  background: linear-gradient(135deg, #5a6268, #494f54);
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+/* Original #popup-close for the single OK button */
+#popup-close {
+  margin-top: 15px;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.1s, box-shadow 0.25s;
+  font-size: 15px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  min-width: 80px; /* Ensure consistent width */
+}
+
+#popup-close:hover {
+  background: linear-gradient(135deg, #0056b3, #004099);
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+/* ===== Animations ===== */
+@keyframes popupScale {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== Mobile responsive ===== */
+@media (max-width: 480px) {
+  .popup-card {
+    width: 85%;
+    padding: 24px 20px;
+  }
+
+  .popup-icon {
+    font-size: 34px;
+  }
+
+  .popup-content p {
+    font-size: 15px;
+  }
+
+  #popup-close {
+    font-size: 14px;
+    padding: 8px 18px;
+  }
+}

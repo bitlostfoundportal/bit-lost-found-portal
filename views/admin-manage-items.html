@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Items (Admin) - BIT Lost & Found Portal</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/popup.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>BIT Lost-Found Portal</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="message-area"></div>
+        <div class="welcome-section" style="text-align: center;">
+            <h2>Manage All Reported Items</h2>
+            <p>Welcome, <span id="adminName"></span> (<span id="adminEmail"></span>)!</p>
+        </div>
+
+        <div class="admin-nav" style="text-align: left; margin-bottom: 20px;">
+            <a href="/admin">⬅ Back to Dashboard</a>
+        </div>
+
+        <section class="admin-section">
+            <h3>All Reported Items</h3>
+            <div class="search-bar-container">
+                <input type="text" id="itemSearchInput" placeholder="Search by Item Name, Type, or Roll No.">
+                <button id="searchItemsBtn">Search</button>
+            </div>
+            <div class="admin-table-container">
+                <table id="allReportsTable" class="admin-table">
+                    <thead>
+                        <tr>
+                            <th class="short">ID</th>
+                            <th>Item Name</th>
+                            <th>Type</th>
+                            <th>Block</th>
+                            <th>Place</th>
+                            <th>Roll No.</th>
+                            <th>Reporter Name</th>
+                            <th class="email">Contact Email</th>
+                            <th class="email">Reporter Email</th>
+                            <th>Initial Status</th>
+                            <th>Status</th>
+                            <th class="date">Date Reported</th>
+                            <th>Mobile Number</th>
+                            <th class="description">Description</th>
+                            <th class="photo">Photo</th>
+                            <th class="description">Remarks</th>
+                            <th>Contact Email Sent</th>
+                            <th>Found By (Roll No.)</th>
+                            <th>Found By (Name)</th>
+                            <th class="date">Found Date</th>
+                            <th class="actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be loaded here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <button id="prevPageBtn">Previous Page</button>
+                <span id="pageInfo">Page 1 of 1</span>
+                <button id="nextPageBtn">Next Page</button>
+            </div>
+        </section>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteModal" class="modal-overlay">
+            <div class="modal-card">
+                <h3>Confirm Deletion</h3>
+                <p>Are you sure you want to permanently delete this <strong id="modalItemType"></strong>?</p>
+                <div class="item-details">
+                    <p><strong>ID:</strong> <span id="modalItemId"></span></p>
+                    <p><strong>Name:</strong> <span id="modalItemName"></span></p>
+                    <p><strong>Status/Roll No.:</strong> <span id="modalItemStatus"></span></p>
+                </div>
+                <div class="button-group">
+                    <button id="confirmDeleteBtn" class="delete-btn">Delete</button>
+                    <button id="cancelDeleteBtn" class="cancel-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="/js/popup.js"></script>
+    <script>
+        let currentDeleteItem = null; // To store the ID and type of the item/student to be deleted
+        let currentPage = 1;
+        const itemsPerPage = 100; // Fixed number of items per page
+        let totalPages = 1;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const messageArea = document.getElementById('message-area');
+            const adminNameSpan = document.getElementById('adminName');
+            const adminEmailSpan = document.getElementById('adminEmail');
+
+            const deleteModal = document.getElementById('deleteModal');
+            const modalItemType = document.getElementById('modalItemType');
+            const modalItemId = document.getElementById('modalItemId');
+            const modalItemName = document.getElementById('modalItemName');
+            const modalItemStatus = document.getElementById('modalItemStatus');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+            const itemSearchInput = document.getElementById('itemSearchInput');
+            const searchItemsBtn = document.getElementById('searchItemsBtn');
+            const prevPageBtn = document.getElementById('prevPageBtn');
+            const nextPageBtn = document.getElementById('nextPageBtn');
+            const pageInfoSpan = document.getElementById('pageInfo');
+
+            // Function to load all reports with pagination and search
+            const loadAllReports = async (page = 1, limit = itemsPerPage, searchTerm = '') => {
+                try {
+                    const url = new URL('/api/admin/reports', window.location.origin);
+                    url.searchParams.append('page', page);
+                    url.searchParams.append('limit', limit);
+                    if (searchTerm) {
+                        url.searchParams.append('searchTerm', searchTerm);
+                    }
+
+                    const response = await fetch(url.toString());
+                    const data = await response.json();
+
+                    if (data.error) {
+                        showPopup(data.error, 'error');
+                        return;
+                    }
+
+                    // Correctly extract reports and pagination info
+                    const reports = data.reports;
+                    currentPage = data.currentPage;
+                    totalPages = data.totalPages;
+
+                    renderReports(reports); // Render reports for the current page
+                    updatePaginationControls();
+
+                } catch (error) {
+                    console.error('Error fetching all reports:', error);
+                    showPopup('Error loading all reports.', 'error');
+                }
+            };
+
+            // Function to render reports into the table
+            const renderReports = (reportsToRender) => {
+                    const tableBody = document.querySelector('#allReportsTable tbody');
+                    tableBody.innerHTML = ''; // Clear existing rows
+
+                if (reportsToRender.length === 0) {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `<td colspan="21" style="text-align: center;">No reported items found.</td>`; // Adjusted colspan
+                    return;
+                }
+
+                reportsToRender.forEach(item => {
+                        const row = tableBody.insertRow();
+                        row.id = `item-row-${item._id}`; // Add a unique ID to the row
+                        row.innerHTML = `
+                            <td class="short">${item._id}</td>
+                            <td>${item.item_name}</td>
+                            <td>${item.item_type}</td>
+                            <td>${item.item_block}</td>
+                            <td>${item.item_place}</td>
+                            <td>${item.rollno}</td>
+                            <td>${item.reporter_name || 'N/A'}</td>
+                            <td class="email">${item.contact_email || 'N/A'}</td>
+                            <td class="email">${item.reporter_email || 'N/A'}</td>
+                            <td>${item.initial_status || 'N/A'}</td>
+                            <td>${item.status}</td>
+                            <td class="date">${new Date(item.date_reported).toLocaleDateString()}</td>
+                            <td>${item.mobile_number || 'N/A'}</td>
+                            <td class="description">${item.description || 'N/A'}</td>
+                            <td class="photo">${item.photo ? `<img src="${item.photo.startsWith('http') ? item.photo : '/uploads/' + item.photo}" class="photo-thumbnail" onclick="window.open('${item.photo.startsWith('http') ? item.photo : '/uploads/' + item.photo}', '_blank')" alt="Item photo" title="Click to view full size">` : '<div class="photo-placeholder">No Photo</div>'}</td>
+                            <td class="description">${item.remarks || 'N/A'}</td>
+                            <td>${item.contact_email_sent ? '✅ Yes' : '❌ No'}</td>
+                            <td>${item.found_by || 'N/A'}</td>
+                            <td>${item.found_by_name || 'N/A'}</td>
+                            <td class="date">${item.found_date ? new Date(item.found_date).toLocaleDateString() : 'N/A'}</td>
+                            <td class="actions">
+                                <button class="admin-action-btn edit" data-id="${item._id}" data-type="item">Edit</button>
+                                <button class="admin-action-btn delete" data-id="${item._id}" data-type="item">Delete</button>
+                            </td>
+                        `;
+                    });
+            };
+
+            // Update pagination control states
+            const updatePaginationControls = () => {
+                pageInfoSpan.textContent = `Page ${currentPage} of ${totalPages}`;
+                prevPageBtn.disabled = currentPage === 1;
+                nextPageBtn.disabled = currentPage === totalPages;
+            };
+
+            // Fetch user info for admin dashboard
+            try {
+                const userRes = await fetch('/api/user');
+                const userData = await userRes.json();
+
+                if (userData.error) {
+                    showPopup(userData.error, 'error');
+                    return;
+                }
+                adminNameSpan.textContent = userData.name;
+                adminEmailSpan.textContent = userData.rollno; // Display rollno as the unique identifier
+
+            } catch (error) {
+                console.error('Error fetching admin user data:', error);
+                showPopup('Error loading admin data.', 'error');
+            }
+
+            // Initial load of reports for the first page
+            loadAllReports(currentPage);
+
+            // Event listener for item search
+            searchItemsBtn.addEventListener('click', () => {
+                currentPage = 1; // Reset to first page for new search
+                loadAllReports(currentPage, itemsPerPage, itemSearchInput.value);
+            });
+            itemSearchInput.addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
+                    currentPage = 1; // Reset to first page for new search
+                    loadAllReports(currentPage, itemsPerPage, itemSearchInput.value);
+                }
+            });
+
+            // Pagination event listeners
+            prevPageBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadAllReports(currentPage, itemsPerPage, itemSearchInput.value);
+                }
+            });
+
+            nextPageBtn.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    loadAllReports(currentPage, itemsPerPage, itemSearchInput.value);
+                }
+            });
+
+            // Add event listeners for action buttons (Edit/Delete) - delegated to tbody
+            document.querySelector('#allReportsTable tbody').addEventListener('click', handleAdminActions);
+
+            // Centralized handler for admin actions (for items)
+            async function handleAdminActions(event) {
+                const target = event.target;
+                const id = target.dataset.id;
+                const type = target.dataset.type;
+
+                if (target.classList.contains('edit')) {
+                    window.location.href = `/admin/edit-item/${id}`; // Redirect to admin item edit page
+                } else if (target.classList.contains('delete')) {
+                    currentDeleteItem = { id: id, type: type }; // Store ID and type
+
+                    // Fetch details for the modal
+                    try {
+                        const response = await fetch(`/api/admin/item/${id}/data`);
+                        const details = await response.json();
+
+                        if (details.error) {
+                            showPopup(details.error, 'error');
+                            return;
+                        }
+
+                        modalItemType.textContent = 'item';
+                        modalItemId.textContent = details._id;
+                        modalItemName.textContent = details.item_name;
+                        modalItemStatus.textContent = details.status;
+                        // Reset button state when opening modal
+                        confirmDeleteBtn.disabled = false;
+                        confirmDeleteBtn.textContent = 'Delete';
+                        deleteModal.classList.add('visible'); // Show the modal
+
+                    } catch (error) {
+                        console.error('Error fetching item details for modal:', error);
+                        showPopup('Failed to load item details for deletion.', 'error');
+                    }
+                }
+            }
+
+            // Handle confirm deletion from modal
+            confirmDeleteBtn.addEventListener('click', async () => {
+                if (!currentDeleteItem) return; 
+
+                confirmDeleteBtn.disabled = true; // Disable button to prevent double-click
+                confirmDeleteBtn.textContent = 'Deleting...'; // Provide feedback
+
+                let deleteEndpoint = '';
+                if (currentDeleteItem.type === 'item') {
+                    deleteEndpoint = `/api/admin/item/${currentDeleteItem.id}`;
+                } else if (currentDeleteItem.type === 'student') {
+                    // This branch should not be reached on this page, but kept for robustness
+                    deleteEndpoint = `/api/admin/student/${currentDeleteItem.id}`;
+                }
+
+                try {
+                    const response = await fetch(deleteEndpoint, {
+                        method: 'DELETE',
+                    });
+                    const result = await response.json();
+                    showPopup(result.message, response.ok ? 'success' : 'error');
+
+                    if (response.ok) {
+                        deleteModal.classList.remove('visible'); // Hide modal
+                        // Directly remove the row from DOM for faster perceived update
+                        const rowToRemove = document.getElementById(`item-row-${currentDeleteItem.id}`); // Use the unique ID
+                        if (rowToRemove) {
+                            rowToRemove.remove();
+                        }
+                        // After deleting, reload reports to update pagination if necessary
+                        loadAllReports(currentPage, itemsPerPage, itemSearchInput.value);
+                    } else {
+                        // If deletion failed, re-enable button
+                        confirmDeleteBtn.disabled = false;
+                        confirmDeleteBtn.textContent = 'Delete';
+                    }
+                } catch (err) {
+                    console.error('Error during item deletion:', err);
+                    showPopup("⚠️ Error deleting item: " + err.message, "error");
+                    confirmDeleteBtn.disabled = false; // Re-enable button on error
+                    confirmDeleteBtn.textContent = 'Delete';
+                }
+                currentDeleteItem = null; // Clear after attempt
+            });
+
+            // Handle cancel deletion from modal or overlay click
+            cancelDeleteBtn.addEventListener('click', () => {
+                deleteModal.classList.remove('visible');
+                currentDeleteItem = null; // Clear the stored item ID
+                confirmDeleteBtn.disabled = false; // Re-enable button
+                confirmDeleteBtn.textContent = 'Delete'; // Reset button text
+            });
+            deleteModal.addEventListener('click', (event) => {
+                if (event.target === deleteModal) {
+                    deleteModal.classList.remove('visible');
+                    currentDeleteItem = null;
+                    confirmDeleteBtn.disabled = false; // Re-enable button
+                    confirmDeleteBtn.textContent = 'Delete'; // Reset button text
+                }
+            });
+
+        });
+
+        // Function to parse URL parameters and display messages
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const msg = urlParams.get('msg');
+            const type = urlParams.get('type');
+
+            if (msg && type) {
+                showPopup(decodeURIComponent(msg), type);
+                // history.replaceState(null, '', window.location.pathname);
+            }
+        });
+    </script>
+</body>
+</html>
