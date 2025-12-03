@@ -268,7 +268,10 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: process.env.NODE_ENV === "production", // Explicitly set rejectUnauthorized within tls
+    // Temporarily set to false for debugging connection timeout issues in production.
+    // If this resolves the issue, it indicates a certificate validation problem.
+    // DO NOT leave this as false in a production environment without understanding the security implications.
+    rejectUnauthorized: false,
   },
   connectionTimeout: 10000, // Keep the 10-second connection timeout
 });
